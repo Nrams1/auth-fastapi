@@ -1,8 +1,7 @@
 
-from pydantic import BaseModel
 from fastapi import APIRouter
-from app.schema import Session, SessionResponse, User, UserResponse
-from app.services.user_service import create_new_user, verify_log_in
+from app.schema import User, UserResponse
+from app.services.user_service import create_new_user, retrive_user_profile
 
 
 
@@ -21,30 +20,18 @@ def create_user(user :User):
 
     return user_res
 
-# Log In
-@router.post("/sessions")
-def log_in_user(session:Session):
-
-    verified_user = verify_log_in(session)
-    if isinstance(verified_user, str):
-         #check how you can return error response with custom message and status code
-
-        return SessionResponse(id="", email="", message=verified_user)
-
-    return verified_user
 
     
-
-
-
-
-"""
+# Get Profile
 @router.get("/users/{user_id}")
-def get_user_profile(user_id):
+def get_user_profile(user_id:str):
     #Assuming the user is already added
-    print(user_dict)
-    return user_dict[user_id]
+    user_profile = retrive_user_profile(user_id)
 
+
+    return user_profile
+
+""""
 @router.put("/users/{use_id}")
 def update_user_details(id):    
     user_dict[id]= {

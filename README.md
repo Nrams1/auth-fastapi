@@ -1,4 +1,4 @@
-***Developed a production-grade REST API from scratch using Python and FastAPI, designed with a clean layered architecture to ensure separation of concerns, maintainability, and testability. The project demonstrates modern backend engineering best practices, including:***
+****Developed a production-grade REST API from scratch using Python and FastAPI, designed with a clean layered architecture to ensure separation of concerns, maintainability, and testability. The project demonstrates modern backend engineering best practices, including:**** 
 
 **System Design:**
 Structured the application into clear layers (API, service, and data access), ensuring business logic is decoupled from external frameworks and infrastructure components.

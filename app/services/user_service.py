@@ -1,7 +1,6 @@
 
-from pydantic import BaseModel, EmailStr
 import uuid
-from app.schema import Session, SessionResponse, User, UserResponse
+from app.schema import User, UserResponse
 
 user_response_list = []
 users_list = [] # This is just for testing purpose, you can replace it with database in future
@@ -10,8 +9,8 @@ users_list = [] # This is just for testing purpose, you can replace it with data
 def create_new_user(user:User):
 
     # Check if user for given email exist , if exist return error response with custom message and status code
-    for i in users_list:
-        if i["email"] == user.email:    
+    for user_info in users_list:
+        if user_info["email"] == user.email:    
             return "User with given email already exist"
 
     # Create new user , Hash password and save in database 
@@ -31,17 +30,14 @@ def create_new_user(user:User):
 
     return user_new
 
-def  verify_log_in(session:Session):
-    # Check if emmail and password match
-    res = ""
-    for i in users_list:
-        print(i)
-        if i["email"] == session.email and  i["password"] == session.password :
-            
-                return SessionResponse(id=i["id"],email=session.email,message="logged in successfully")
-        
-        elif i["email"] == session.email and  i["password"] != session.password : 
-                 return "Invalid password"
-        
-    return "User Doesnt Exist"   
+
+
+def retrive_user_profile(id:str):
+     
+    for user_info in users_list:
+        if user_info["id"] == id:
+            return user_info
+
+    return "User Doesnt Exist" 
+          
                 

@@ -19,3 +19,4 @@ class SessionResponse(BaseModel):
     id:str
     email:str
     message : str = "" # This is just for testing purpose, you can replace it with error response in future
+
