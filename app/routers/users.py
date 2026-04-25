@@ -1,7 +1,10 @@
 
-from fastapi import APIRouter
-from app.schema import User, UserResponse
-from app.services.user_service import create_new_user, retrive_user_profile
+from fastapi import APIRouter, Depends
+from app.data_access import model
+from app.data_access.db import get_db
+from app.schema import User 
+from sqlalchemy.orm import Session
+
 
 
 
@@ -9,19 +12,31 @@ router = APIRouter()
 
 
 # Create New User
-@router.post("/users", response_model= UserResponse)
-def create_user(user :User):
-    user_res = create_new_user(user)
+@router.post("/users")
+def create_user(user :User,db:Session = Depends(get_db)):
+    # check if email exist 
+    new_user = db.query(model.User).filter(model.User.email == user.email).first()
+    #print(new_user.isInstance())
+    if new_user is None:
+      
+        db_user = model.User(email=user.email,password=user.password)
+        added_user = db.add(db_user)
+        db.commit()
+        
+        new_user = db.query(model.User).filter(model.User.email == user.email).first()
 
-    if isinstance(user_res, str):
-         #check how you can return error response with custom message and status code
-
-        return UserResponse(id="", email="", message="User Exist")
-
-    return user_res
-
-
+        return new_user
     
+    return new_user
+        
+
+    print("-------------------------")
+    print(new_user)
+    print("-------------------------")
+    
+
+
+""""    
 # Get Profile
 @router.get("/users/{user_id}")
 def get_user_profile(user_id:str):
@@ -31,7 +46,7 @@ def get_user_profile(user_id:str):
 
     return user_profile
 
-""""
+
 @router.put("/users/{use_id}")
 def update_user_details(id):    
     user_dict[id]= {
