@@ -1,43 +1,42 @@
 
-import uuid
+
 from app.schema import User, UserResponse
+from app.data_access import db, users_db
+from bcrypt import gensalt, hashpw
+from app.data_access import model
+from sqlalchemy.orm import Session
 
-user_response_list = []
-users_list = [] # This is just for testing purpose, you can replace it with database in future
 
 
-def create_new_user(user:User):
+def create_new_user(user:User,db:Session):
 
     # Check if user for given email exist , if exist return error response with custom message and status code
-    for user_info in users_list:
-        if user_info["email"] == user.email:    
-            return "User with given email already exist"
+    new_user = users_db.retrieve_user_by_email(user,db)
+
+    if new_user is None:
 
     # Create new user , Hash password and save in database 
-    id = str(uuid.uuid4())
-    users_dict = user.model_dump()
-    users_dict["id"] = id
-    users_list.append(users_dict)
+        hash_password = hashpw(user.password.encode('utf-8'),gensalt())
+        # Check if hashpassword did not fail , and handle the error
+        db_user = model.User(email=user.email,password = hash_password.decode('utf-8'))
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
 
-    # Create new user return response
-    user_new = UserResponse(id=id, email=user.email,message="User Created Successfully") 
-   
-    print(users_list)
-    user_response_list.append(user_new)
-    #Return a token to user for authentication and authorization
-
+        return db_user
+    
+    return "User already Exist"
     
 
-    return user_new
-
-
-
-def retrive_user_profile(id:str):
+def retrieve_user_profile(id:User,db:Session):
      
-    for user_info in users_list:
-        if user_info["id"] == id:
-            return user_info
+    db_user = users_db.get_user_by_id(id,db)
 
-    return "User Doesnt Exist" 
+    if db_user is None:
+         
+         return "User Id not available"
+
+
+    return  db_user
           
                 

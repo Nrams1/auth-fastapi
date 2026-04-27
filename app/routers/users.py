@@ -2,8 +2,10 @@
 from fastapi import APIRouter, Depends
 from app.data_access import model
 from app.data_access.db import get_db
-from app.schema import User 
+from app.schema import User, UserResponse 
 from sqlalchemy.orm import Session
+
+from app.services.user_service import create_new_user, retrieve_user_profile
 
 
 
@@ -12,40 +14,23 @@ router = APIRouter()
 
 
 # Create New User
-@router.post("/users")
+@router.post("/users",) 
 def create_user(user :User,db:Session = Depends(get_db)):
-    # check if email exist 
-    new_user = db.query(model.User).filter(model.User.email == user.email).first()
-    #print(new_user.isInstance())
-    if new_user is None:
-      
-        db_user = model.User(email=user.email,password=user.password)
-        added_user = db.add(db_user)
-        db.commit()
-        
-        new_user = db.query(model.User).filter(model.User.email == user.email).first()
+    res = create_new_user(user,db)
 
-        return new_user
     
-    return new_user
-        
+    return res
+  
 
-    print("-------------------------")
-    print(new_user)
-    print("-------------------------")
-    
-
-
-""""    
 # Get Profile
 @router.get("/users/{user_id}")
-def get_user_profile(user_id:str):
-    #Assuming the user is already added
-    user_profile = retrive_user_profile(user_id)
+def get_user_profile(user_id:int,db:Session = Depends(get_db)):
 
+    user_profile = retrieve_user_profile(user_id,db)
 
     return user_profile
 
+"""
 
 @router.put("/users/{use_id}")
 def update_user_details(id):    
