@@ -5,15 +5,20 @@ from app.services import user_service
 from app.data_access import users_db 
 from sqlalchemy.orm import Session
 
+from security import create_access_token, verify_password
+
+
 
 
 def  verify_log_in(session_req:SessionReq ,db:Session):
     # Check if email and password match
     verified_user = users_db.retrieve_user_by_email(session_req,db)
 
-    if verified_user is not None and verified_user.email == session_req.email and checkpw(session_req.password.encode('utf-8'),verified_user.password.encode('utf-8')) :
+    if verified_user is not None and verify_password(session_req.password,verified_user.password):
+
+        access_token = create_access_token(data={"sub": session_req.username})
             
-            return SessionRes(id=verified_user.id,email=verified_user.email,message="Logged in successfully")
+        return {"access_token": access_token, "token_type": "bearer","message":"Logged in successfully"}
 
     return SessionRes(id=0,email="",message="Invalid Credentials")
         

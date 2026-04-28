@@ -26,3 +26,6 @@ class SessionRes(BaseModel):
     email:str 
     message : str = "" # This is just for testing purpose, you can replace it with error response in future
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
