@@ -1,26 +1,30 @@
 
-from bcrypt import checkpw
-from app.schema import SessionReq, SessionRes
-from app.services import user_service
+
+from fastapi import HTTPException
+
 from app.data_access import users_db 
 from sqlalchemy.orm import Session
 
+from app.schema import Token
 from security import create_access_token, verify_password
 
 
 
-
-def  verify_log_in(session_req:SessionReq ,db:Session):
+def  verify_log_in( db:Session,form_data ):
     # Check if email and password match
-    verified_user = users_db.retrieve_user_by_email(session_req,db)
+   
+    verified_user = users_db.retrieve_user_by_email(db,form_data.username)
 
-    if verified_user is not None and verify_password(session_req.password,verified_user.password):
+    if verified_user is not None and verify_password(form_data.password,verified_user.password):
 
-        access_token = create_access_token(data={"sub": session_req.username})
+        access_token = create_access_token(data={"sub": str(verified_user.id)})
             
-        return {"access_token": access_token, "token_type": "bearer","message":"Logged in successfully"}
+        return {"access_token":access_token,"token_type":"Bearer","user":verified_user}
+    
+   
 
-    return SessionRes(id=0,email="",message="Invalid Credentials")
+
+
         
     
                  
