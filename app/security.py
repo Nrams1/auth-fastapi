@@ -18,7 +18,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
 
 
-def hash_password(password):
+def  hash_password(password):
+
+    if not password:
+                raise ValueError("Password cannot be empty!")
+    
     return  hashpw(password.encode('utf-8'),gensalt()).decode('utf-8')
 
 def verify_password(plain_password,Hashed_password):
@@ -27,11 +31,18 @@ def verify_password(plain_password,Hashed_password):
 
 def create_access_token(data:dict, expires_delta:timedelta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
 
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    try :
+        to_encode = data.copy()
+        expire = datetime.now(timezone.utc) + expires_delta
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return encoded_jwt
+
+    except jwt.PyJWTError as e:
+        # Catch-all for any JWT-related encoding issues
+        print(f"JWT Generation failed: {e}")
+        raise ValueError("Could not generate authentication token.")
+        
 
 
 def get_current_user(token: str = Depends(oath2_scheme), db: Session = Depends(get_db)): 

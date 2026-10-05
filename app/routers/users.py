@@ -6,7 +6,7 @@ from app.schema import User, UserResponse
 from sqlalchemy.orm import Session
 
 from app.services.user_service import create_new_user
-from security import get_current_user
+from app.security import get_current_user
 
 
 

@@ -6,7 +6,7 @@ from app.schema import Token, User
 from app.services.session_service import verify_log_in
 from sqlalchemy.orm import Session
 
-from security import get_current_user
+from app.security import get_current_user
 
 
 
@@ -18,7 +18,7 @@ router = APIRouter()
 # Log In
 @router.post("/login",status_code=200,response_model=Token)
 def log_in_user(form_data: OAuth2PasswordRequestForm = Depends(),db:Session = Depends(get_db)):
-    
+
     token = verify_log_in(db,form_data)
     if token is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
